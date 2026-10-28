@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Agendar cita{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-calendar-plus"></i> Solicitar cita</div>
+            <div class="card-body">
+                <form method="post">
+                    <div class="mb-3">
+                        <label class="form-label">Servicio (opcional)</label>
+                        <select name="service_id" class="form-select">
+                            <option value="">— Solo visita / consulta —</option>
+                            {% for s in services %}
+                            <option value="{{ s.id }}">{{ s.name }} (${{ '%.2f'|format(s.price) }} · {{ s.duration_minutes }} min)</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Fecha *</label>
+                            <input type="date" name="date" class="form-control" required min="{{ range(1)|list and '' }}">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Hora preferida *</label>
+                            <input type="time" name="time" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Notas o motivo</label>
+                        <textarea name="notes" class="form-control" rows="2" placeholder="Cuéntanos el motivo de tu visita..."></textarea>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">Solicitar cita</button>
+                        <a href="{{ url_for('client_portal') }}" class="btn btn-outline-secondary">Cancelar</a>
+                    </div>
+                </form>
+                {% if hours %}
+                <hr>
+                <p class="small text-muted mb-1"><strong>Horarios del negocio:</strong></p>
+                <ul class="small text-muted mb-0">
+                    {% set days = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'] %}
+                    {% for h in hours %}
+                    <li>{{ days[h.day_of_week] }}:
+                        {% if h.is_closed %}Cerrado{% else %}{{ h.open_time }} - {{ h.close_time }}{% endif %}
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Set min date to today
+document.querySelector('input[name="date"]').min = new Date().toISOString().split('T')[0];
+</script>
+{% endblock %}

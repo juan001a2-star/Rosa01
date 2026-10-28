@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Catálogo{% endblock %}
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-grid"></i> Catálogo de productos y servicios</h2>
+
+{% if categories %}
+<div class="mb-3">
+    <a href="{{ url_for('catalogo') }}" class="btn btn-sm {% if not cat_id %}btn-primary{% else %}btn-outline-primary{% endif %}">Todas</a>
+    {% for c in categories %}
+    <a href="{{ url_for('catalogo', categoria=c.id) }}" class="btn btn-sm {% if cat_id == c.id %}btn-primary{% else %}btn-outline-primary{% endif %}">{{ c.name }}</a>
+    {% endfor %}
+</div>
+{% endif %}
+
+<h4 class="mb-3">Productos</h4>
+<div class="row g-3 mb-5">
+    {% for p in products %}
+    <div class="col-6 col-md-4 col-lg-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <h6 class="card-title">{{ p.name }}</h6>
+                <p class="small text-muted">{{ p.description or '' }}</p>
+                <p class="price mb-0">${{ '%.2f'|format(p.sale_price) }}</p>
+                {% if p.stock <= 0 %}
+                <span class="badge bg-danger mt-1">Agotado</span>
+                {% elif p.stock <= p.min_stock %}
+                <span class="badge bg-warning text-dark mt-1">Pocas unidades</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <p class="text-muted">No hay productos disponibles.</p>
+    {% endfor %}
+</div>
+
+<h4 class="mb-3">Servicios</h4>
+<div class="row g-3">
+    {% for s in services %}
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5>{{ s.name }}</h5>
+                <p class="text-muted small">{{ s.description or '' }}</p>
+                <p class="price mb-0">${{ '%.2f'|format(s.price) }}
+                    <small class="text-muted">· {{ s.duration_minutes }} minutos</small>
+                </p>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <p class="text-muted">No hay servicios disponibles.</p>
+    {% endfor %}
+</div>
+
+{% if not current_user.is_authenticated %}
+<div class="alert alert-info mt-4">
+    <i class="bi bi-info-circle"></i> ¿Quieres agendar una cita? <a href="{{ url_for('register') }}">Regístrate</a> o <a href="{{ url_for('login') }}">inicia sesión</a>.
+</div>
+{% endif %}
+{% endblock %}

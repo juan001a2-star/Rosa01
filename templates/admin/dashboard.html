@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% block title %}Panel de Administración{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-speedometer2"></i> Panel de Administración</h2>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <div class="card stat-card">
+            <div class="card-body">
+                <div class="text-muted small">Productos activos</div>
+                <div class="fs-3 fw-bold">{{ total_products }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card stat-card">
+            <div class="card-body">
+                <div class="text-muted small">Stock bajo</div>
+                <div class="fs-3 fw-bold {% if low_stock > 0 %}text-danger{% endif %}">{{ low_stock }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card stat-card">
+            <div class="card-body">
+                <div class="text-muted small">Ventas hoy</div>
+                <div class="fs-3 fw-bold text-success">${{ '%.2f'|format(ventas_hoy) }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card stat-card">
+            <div class="card-body">
+                <div class="text-muted small">Gastos hoy</div>
+                <div class="fs-3 fw-bold text-danger">${{ '%.2f'|format(gastos_hoy) }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <a href="{{ url_for('admin_productos') }}" class="card text-decoration-none h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-box-seam fs-2 text-primary"></i>
+                <h6 class="mt-2 mb-0">Almacén / Productos</h6>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a href="{{ url_for('admin_caja') }}" class="card text-decoration-none h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-cash-register fs-2 text-success"></i>
+                <h6 class="mt-2 mb-0">Caja Registradora</h6>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a href="{{ url_for('admin_servicios') }}" class="card text-decoration-none h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-tools fs-2 text-info"></i>
+                <h6 class="mt-2 mb-0">Servicios</h6>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a href="{{ url_for('admin_citas') }}" class="card text-decoration-none h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-calendar-check fs-2 text-warning"></i>
+                <h6 class="mt-2 mb-0">Citas {% if citas_pendientes %}<span class="badge bg-danger">{{ citas_pendientes }}</span>{% endif %}</h6>
+            </div>
+        </a>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-md-3">
+        <a href="{{ url_for('admin_horarios') }}" class="btn btn-outline-secondary w-100"><i class="bi bi-clock"></i> Horarios</a>
+    </div>
+    <div class="col-md-3">
+        <a href="{{ url_for('caja_historial') }}" class="btn btn-outline-secondary w-100"><i class="bi bi-clock-history"></i> Historial</a>
+    </div>
+    <div class="col-md-3">
+        <a href="{{ url_for('admin_categorias') }}" class="btn btn-outline-secondary w-100"><i class="bi bi-tags"></i> Categorías</a>
+    </div>
+    <div class="col-md-3">
+        <a href="{{ url_for('admin_ganancias') }}" class="btn btn-outline-success w-100"><i class="bi bi-graph-up-arrow"></i> Ganancias</a>
+    </div>
+</div>
+
+{% if recent_tx %}
+<h4 class="mt-5 mb-3">Últimas transacciones</h4>
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Tipo</th>
+                    <th>Descripción</th>
+                    <th class="text-end">Monto</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for t in recent_tx %}
+                <tr>
+                    <td>{{ t.date.strftime('%d/%m %H:%M') }}</td>
+                    <td>
+                        {% if t.type == 'venta' %}<span class="badge bg-success">Venta</span>
+                        {% elif t.type == 'gasto' %}<span class="badge bg-danger">Gasto</span>
+                        {% elif t.type == 'compra' %}<span class="badge bg-warning text-dark">Compra</span>
+                        {% else %}<span class="badge bg-secondary">{{ t.type }}</span>{% endif %}
+                    </td>
+                    <td>{{ t.description or '—' }}</td>
+                    <td class="text-end {% if t.amount >= 0 %}text-success{% else %}text-danger{% endif %}">
+                        ${{ '%.2f'|format(t.amount) }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

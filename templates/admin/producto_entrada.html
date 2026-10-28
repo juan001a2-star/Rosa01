@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Entrada de stock - {{ product.name }}{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">Entrada de mercancía / Compra</div>
+            <div class="card-body">
+                <p><strong>{{ product.name }}</strong></p>
+                <p class="text-muted">Stock actual: <span class="badge bg-primary">{{ product.stock }}</span> · Precio compra actual: ${{ '%.2f'|format(product.purchase_price) }}</p>
+                <form method="post">
+                    <div class="mb-3">
+                        <label class="form-label">Cantidad a ingresar *</label>
+                        <input type="number" name="quantity" class="form-control" min="1" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Costo unitario de esta compra</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="number" step="0.01" min="0" name="unit_cost" class="form-control"
+                                   value="{{ product.purchase_price }}">
+                        </div>
+                        <div class="form-text">Se actualizará el precio de compra del producto.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Método de pago</label>
+                        <select name="payment_method" class="form-select">
+                            <option value="efectivo">Efectivo</option>
+                            <option value="tarjeta">Tarjeta</option>
+                            <option value="transferencia">Transferencia</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Notas</label>
+                        <textarea name="notes" class="form-control" rows="2" placeholder="Proveedor, factura, etc."></textarea>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-success"><i class="bi bi-box-arrow-in-down"></i> Registrar entrada</button>
+                        <a href="{{ url_for('admin_productos') }}" class="btn btn-outline-secondary">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

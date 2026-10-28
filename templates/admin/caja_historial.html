@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Historial de Transacciones{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-clock-history"></i> Historial de transacciones</h2>
+    <a href="{{ url_for('admin_caja') }}" class="btn btn-outline-secondary btn-sm">← Volver a caja</a>
+</div>
+
+<div class="mb-3">
+    <a href="{{ url_for('caja_historial') }}" class="btn btn-sm {% if not tipo %}btn-primary{% else %}btn-outline-primary{% endif %}">Todos</a>
+    <a href="{{ url_for('caja_historial', tipo='venta') }}" class="btn btn-sm {% if tipo=='venta' %}btn-success{% else %}btn-outline-success{% endif %}">Ventas</a>
+    <a href="{{ url_for('caja_historial', tipo='gasto') }}" class="btn btn-sm {% if tipo=='gasto' %}btn-danger{% else %}btn-outline-danger{% endif %}">Gastos</a>
+    <a href="{{ url_for('caja_historial', tipo='compra') }}" class="btn btn-sm {% if tipo=='compra' %}btn-warning{% else %}btn-outline-warning{% endif %}">Compras</a>
+</div>
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Tipo</th>
+                    <th>Descripción</th>
+                    <th>Pago</th>
+                    <th>Registrado por</th>
+                    <th class="text-end">Monto</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for t in transactions.items %}
+                <tr>
+                    <td>{{ t.date.strftime('%d/%m/%Y %H:%M') }}</td>
+                    <td>
+                        {% if t.type == 'venta' %}<span class="badge bg-success">Venta</span>
+                        {% elif t.type == 'gasto' %}<span class="badge bg-danger">Gasto</span>
+                        {% elif t.type == 'compra' %}<span class="badge bg-warning text-dark">Compra</span>
+                        {% else %}{{ t.type }}{% endif %}
+                    </td>
+                    <td>{{ t.description or '—' }}</td>
+                    <td>{{ t.payment_method }}</td>
+                    <td>{{ t.user.name if t.user else '—' }}</td>
+                    <td class="text-end {% if t.amount >= 0 %}text-success{% else %}text-danger{% endif %}">
+                        ${{ '%.2f'|format(t.amount) }}
+                    </td>
+                    <td>
+                        {% if t.type == 'venta' %}
+                        <a href="{{ url_for('ticket_venta', id=t.id) }}" class="btn btn-sm btn-outline-secondary" title="Imprimir ticket"><i class="bi bi-printer"></i></a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="7" class="text-center text-muted py-4">Sin transacciones.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% if transactions.pages > 1 %}
+    <div class="card-footer d-flex justify-content-center">
+        <nav>
+            <ul class="pagination mb-0">
+                {% if transactions.has_prev %}
+                <li class="page-item"><a class="page-link" href="{{ url_for('caja_historial', page=transactions.prev_num, tipo=tipo) }}">Anterior</a></li>
+                {% endif %}
+                <li class="page-item disabled"><span class="page-link">{{ transactions.page }} / {{ transactions.pages }}</span></li>
+                {% if transactions.has_next %}
+                <li class="page-item"><a class="page-link" href="{{ url_for('caja_historial', page=transactions.next_num, tipo=tipo) }}">Siguiente</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

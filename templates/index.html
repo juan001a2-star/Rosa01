@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block title %}Inicio - Mi Negocio{% endblock %}
+{% block content %}
+<div class="row align-items-center mb-5">
+    <div class="col-lg-7">
+        <h1 class="display-5 fw-bold mb-3">Bienvenido a tu negocio digital</h1>
+        <p class="lead text-muted">Gestiona inventario, ventas, servicios y citas de forma sencilla y profesional.</p>
+        <div class="d-flex gap-2 flex-wrap">
+            <a href="{{ url_for('catalogo') }}" class="btn btn-primary btn-lg"><i class="bi bi-grid"></i> Ver catálogo</a>
+            {% if not current_user.is_authenticated %}
+            <a href="{{ url_for('login') }}" class="btn btn-outline-primary btn-lg">Ingresar</a>
+            {% elif current_user.role == 'admin' %}
+            <a href="{{ url_for('admin_dashboard') }}" class="btn btn-success btn-lg"><i class="bi bi-speedometer2"></i> Panel Admin</a>
+            {% else %}
+            <a href="{{ url_for('client_portal') }}" class="btn btn-success btn-lg"><i class="bi bi-person"></i> Mi Portal</a>
+            {% endif %}
+        </div>
+    </div>
+    <div class="col-lg-5 text-center d-none d-lg-block">
+        <i class="bi bi-shop-window display-1 text-primary opacity-50"></i>
+    </div>
+</div>
+
+<div class="row g-4 mb-5">
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-box-seam fs-1 text-primary mb-3"></i>
+                <h5>Almacén</h5>
+                <p class="text-muted small">Control de entradas, salidas, precios de compra y venta, y stock en tiempo real.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-cash-register fs-1 text-success mb-3"></i>
+                <h5>Caja Registradora</h5>
+                <p class="text-muted small">Registra ventas de productos y servicios, gastos y consulta el historial completo.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-calendar-check fs-1 text-warning mb-3"></i>
+                <h5>Citas y Clientes</h5>
+                <p class="text-muted small">Los clientes ven precios, horarios y pueden agendar citas fácilmente.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if products %}
+<h3 class="mb-3">Productos destacados</h3>
+<div class="row g-3 mb-5">
+    {% for p in products %}
+    <div class="col-6 col-md-4 col-lg-2">
+        <div class="card h-100">
+            <div class="card-body">
+                <h6 class="card-title mb-1">{{ p.name }}</h6>
+                <p class="price mb-0">${{ '%.2f'|format(p.sale_price) }}</p>
+                <small class="text-muted">Stock: {{ p.stock }}</small>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% if services %}
+<h3 class="mb-3">Servicios</h3>
+<div class="row g-3 mb-5">
+    {% for s in services %}
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">{{ s.name }}</h5>
+                <p class="text-muted small">{{ s.description or '' }}</p>
+                <p class="price mb-0">${{ '%.2f'|format(s.price) }} <small class="text-muted">· {{ s.duration_minutes }} min</small></p>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% if hours %}
+<h3 class="mb-3">Horarios de atención</h3>
+<div class="card">
+    <div class="card-body">
+        <div class="row">
+            {% for h in hours %}
+            <div class="col-6 col-md-3 mb-2">
+                <strong>{{ days[h.day_of_week] }}:</strong>
+                {% if h.is_closed %}
+                    <span class="text-danger">Cerrado</span>
+                {% else %}
+                    {{ h.open_time }} - {{ h.close_time }}
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Ingresar{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-5">
+        <div class="card">
+            <div class="card-body p-4">
+                <h3 class="mb-4 text-center"><i class="bi bi-box-arrow-in-right"></i> Iniciar sesión</h3>
+                <form method="post">
+                    <div class="mb-3">
+                        <label class="form-label">Usuario</label>
+                        <input type="text" name="username" class="form-control" required autofocus>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Contraseña</label>
+                        <input type="password" name="password" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Ingresar</button>
+                </form>
+                <p class="text-center mt-3 mb-0 small">
+                    ¿No tienes cuenta? <a href="{{ url_for('register') }}">Regístrate</a>
+                </p>
+                <hr>
+                <p class="small text-muted mb-0">
+                    <strong>Demo:</strong><br>
+                    Admin → usuario: <code>admin</code> / pass: <code>admin123</code><br>
+                    Cliente → usuario: <code>cliente</code> / pass: <code>cliente123</code>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

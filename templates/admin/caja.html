@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}Caja Registradora{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-cash-register"></i> Caja Registradora</h2>
+    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-secondary btn-sm">← Volver</a>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body text-center">
+                <div class="text-muted small">Ingresos de hoy</div>
+                <div class="fs-3 fw-bold text-success">${{ '%.2f'|format(ingresos) }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body text-center">
+                <div class="text-muted small">Egresos de hoy</div>
+                <div class="fs-3 fw-bold text-danger">${{ '%.2f'|format(egresos) }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body text-center">
+                <div class="text-muted small">Balance del día</div>
+                <div class="fs-3 fw-bold {% if (ingresos - egresos) >= 0 %}text-success{% else %}text-danger{% endif %}">
+                    ${{ '%.2f'|format(ingresos - egresos) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="d-flex gap-2 mb-4 flex-wrap">
+    <a href="{{ url_for('caja_venta') }}" class="btn btn-success"><i class="bi bi-cart-plus"></i> Nueva venta</a>
+    <a href="{{ url_for('caja_gasto') }}" class="btn btn-danger"><i class="bi bi-cash-stack"></i> Registrar gasto</a>
+    <a href="{{ url_for('caja_historial') }}" class="btn btn-outline-primary"><i class="bi bi-clock-history"></i> Historial completo</a>
+</div>
+
+<h5 class="mb-3">Movimientos de hoy ({{ today.strftime('%d/%m/%Y') }})</h5>
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>Hora</th>
+                    <th>Tipo</th>
+                    <th>Descripción</th>
+                    <th>Pago</th>
+                    <th class="text-end">Monto</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for t in transactions %}
+                <tr>
+                    <td>{{ t.date.strftime('%H:%M') }}</td>
+                    <td>
+                        {% if t.type == 'venta' %}<span class="badge bg-success">Venta</span>
+                        {% elif t.type == 'gasto' %}<span class="badge bg-danger">Gasto</span>
+                        {% elif t.type == 'compra' %}<span class="badge bg-warning text-dark">Compra</span>
+                        {% else %}{{ t.type }}{% endif %}
+                    </td>
+                    <td>{{ t.description or '—' }}</td>
+                    <td>{{ t.payment_method }}</td>
+                    <td class="text-end {% if t.amount >= 0 %}text-success{% else %}text-danger{% endif %}">
+                        ${{ '%.2f'|format(t.amount) }}
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="5" class="text-center text-muted py-4">Sin movimientos hoy.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

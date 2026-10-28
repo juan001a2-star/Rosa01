@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ticket #{{ tx.id }}</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Courier New', monospace; font-size: 13px; max-width: 320px; margin: 20px auto; color: #111; }
+        .center { text-align: center; }
+        .right { text-align: right; }
+        .bold { font-weight: bold; }
+        .line { border-top: 1px dashed #333; margin: 8px 0; }
+        .double { border-top: 2px solid #333; margin: 8px 0; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 2px 0; }
+        th { text-align: left; font-size: 11px; border-bottom: 1px solid #333; }
+        .qty { width: 30px; text-align: center; }
+        .price { text-align: right; }
+        .no-print { margin: 20px auto; max-width: 320px; text-align: center; }
+        @media print {
+            .no-print { display: none !important; }
+            body { margin: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="center bold" style="font-size:16px">MI NEGOCIO</div>
+    <div class="center">Ticket de venta</div>
+    <div class="center">#{{ tx.id }}</div>
+    <div class="line"></div>
+    <div>Fecha: {{ tx.date.strftime('%d/%m/%Y %H:%M') }}</div>
+    <div>Atendido por: {{ tx.user.name if tx.user else '—' }}</div>
+    {% if tx.client %}
+    <div>Cliente: {{ tx.client.name }}</div>
+    {% endif %}
+    <div>Pago: {{ tx.payment_method|capitalize }}</div>
+    <div class="line"></div>
+    <table>
+        <thead>
+            <tr>
+                <th>Cant</th>
+                <th>Descripción</th>
+                <th class="right">Importe</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for it in items %}
+            <tr>
+                <td class="qty">{{ it.quantity }}</td>
+                <td>
+                    {% if it.product %}{{ it.product.name }}{% elif it.service %}{{ it.service.name }}{% else %}Ítem{% endif %}
+                    <br><span style="font-size:11px">${{ '%.2f'|format(it.unit_price) }} c/u</span>
+                </td>
+                <td class="price">${{ '%.2f'|format(it.subtotal) }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="double"></div>
+    <div class="bold" style="display:flex;justify-content:space-between;font-size:15px">
+        <span>TOTAL</span>
+        <span>${{ '%.2f'|format(tx.amount) }}</span>
+    </div>
+    {% if tx.description %}
+    <div class="line"></div>
+    <div style="font-size:11px">Nota: {{ tx.description }}</div>
+    {% endif %}
+    <div class="line"></div>
+    <div class="center" style="margin-top:12px">¡Gracias por su compra!</div>
+    <div class="center" style="font-size:11px;margin-top:4px">www.minegocio.local</div>
+
+    <div class="no-print">
+        <button onclick="window.print()" style="padding:10px 24px;font-size:14px;cursor:pointer;background:#0d6efd;color:#fff;border:none;border-radius:6px">
+            🖨 Imprimir ticket
+        </button>
+        <br><br>
+        <a href="{{ url_for('admin_caja') }}">← Volver a caja</a>
+        &nbsp;·&nbsp;
+        <a href="{{ url_for('caja_historial') }}">Historial</a>
+    </div>
+</body>
+</html>

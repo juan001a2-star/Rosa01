@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Almacén - Productos{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-box-seam"></i> Almacén / Productos</h2>
+    <div>
+        <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-secondary btn-sm me-2">← Volver</a>
+        <a href="{{ url_for('admin_categorias') }}" class="btn btn-outline-secondary btn-sm me-2"><i class="bi bi-tags"></i> Categorías</a>
+        <a href="{{ url_for('producto_nuevo') }}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Nuevo producto</a>
+    </div>
+</div>
+<div class="mb-3">
+    <a href="{{ url_for('admin_productos') }}" class="btn btn-sm {% if not cat_id %}btn-primary{% else %}btn-outline-primary{% endif %}">Todas</a>
+    {% for c in categories %}
+    <a href="{{ url_for('admin_productos', categoria=c.id) }}" class="btn btn-sm {% if cat_id == c.id %}btn-primary{% else %}btn-outline-primary{% endif %}">{{ c.name }}</a>
+    {% endfor %}
+</div>
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Categoría</th>
+                    <th class="text-end">P. Compra</th>
+                    <th class="text-end">P. Venta</th>
+                    <th class="text-center">Stock</th>
+                    <th class="text-end">Valor stock</th>
+                    <th>Estado</th>
+                    <th class="text-end">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in products %}
+                <tr>
+                    <td>
+                        <strong>{{ p.name }}</strong>
+                        {% if p.description %}<br><small class="text-muted">{{ p.description[:60] }}{% if p.description|length > 60 %}...{% endif %}</small>{% endif %}
+                    </td>
+                    <td>{{ p.category.name if p.category else '—' }}</td>
+                    <td class="text-end">${{ '%.2f'|format(p.purchase_price) }}</td>
+                    <td class="text-end price">${{ '%.2f'|format(p.sale_price) }}</td>
+                    <td class="text-center">
+                        <span class="badge {% if p.stock <= p.min_stock %}bg-danger{% else %}bg-success{% endif %}">
+                            {{ p.stock }}
+                        </span>
+                    </td>
+                    <td class="text-end">${{ '%.2f'|format(p.stock * p.purchase_price) }}</td>
+                    <td>
+                        {% if p.is_active %}<span class="badge bg-success">Activo</span>
+                        {% else %}<span class="badge bg-secondary">Inactivo</span>{% endif %}
+                    </td>
+                    <td class="text-end">
+                        <a href="{{ url_for('producto_entrada', id=p.id) }}" class="btn btn-sm btn-outline-success btn-action" title="Entrada de stock">
+                            <i class="bi bi-box-arrow-in-down"></i>
+                        </a>
+                        <a href="{{ url_for('producto_movimientos', id=p.id) }}" class="btn btn-sm btn-outline-info btn-action" title="Movimientos">
+                            <i class="bi bi-clock-history"></i>
+                        </a>
+                        <a href="{{ url_for('producto_editar', id=p.id) }}" class="btn btn-sm btn-outline-primary btn-action" title="Editar">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="8" class="text-center text-muted py-4">No hay productos. Crea el primero.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
