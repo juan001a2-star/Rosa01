@@ -22,9 +22,12 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'negocio-secreto-cambiar
 # DATABASE_URL (PostgreSQL en Render) o SQLite en /tmp
 database_url = os.environ.get('DATABASE_URL')
 if database_url:
-    # Render a veces usa postgres:// ; SQLAlchemy necesita postgresql://
+    # Forzar el driver psycopg2, que está instalado en requirements.txt.
+    # Render puede entregar DATABASE_URL con cualquiera de estos prefijos.
     if database_url.startswith('postgres://'):
-        database_url = database_url.replace('postgres://', 'postgresql://', 1)
+        database_url = database_url.replace('postgres://', 'postgresql+psycopg2://', 1)
+    elif database_url.startswith('postgresql://'):
+        database_url = database_url.replace('postgresql://', 'postgresql+psycopg2://', 1)
     app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 else:
     # SQLite en /tmp (escribible en Render; el disco es efímero)
